@@ -132,3 +132,12 @@ dmypy.json
 # vscode
 .vscode/
 .launch/
+
+# data files
+*.csv
+*.json
+*.zip
+*.tar
+*.tar.gz
+*.flac
+*.wav
