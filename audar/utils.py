@@ -1,10 +1,13 @@
+from genericpath import exists
 import requests
 import youtube_dl
 from tqdm import tqdm
+from os.path import exists
 
-
-def download_file(url, output_dir="./"):
+def download_file(url, output_dir="./", overwrite=False):
     output_file = output_dir + url.split("/")[-1]
+    if exists(output_file) and not overwrite:
+        return
 
     r = requests.get(url, stream=True)
     total_size = int(r.headers.get('content-length', 0))
