@@ -44,7 +44,7 @@ class AudiosetOntology:
         for k, v in self.id_to_class.items():
             yield k, v
 
-    def _id_to_class(self, id):
+    def _id_to_class(self, id: str) -> AudiosetClass:
         return self.id_to_class.get(id, AudiosetClass())
 
     def __call__(self, class_id: Union[str, List[str]]) -> str:
@@ -113,23 +113,13 @@ class AudiosetSegment:
         if self.class_filters:
             self.annotations = self.filter_annotations(self.annotations)
 
-    def filter_annotations(self, annotations):
+    def filter_annotations(self, annotations: List[dict]):
         annotations_filtered = []
         class_ids = [k for k, v  in self.ontology.items() if v.name.lower() in self.class_filters]
         for annotation in annotations:
             if set(class_ids) & set(annotation.get('positive_labels', [])):
                 annotations_filtered.append(annotation)
         return annotations_filtered
-
-
-# def download_audioset_segment(segment_url, output_dir):
-#     ontology = retrieve_ontology()
-#     download_file(segment_url)
-#     with open(segment_url.split("/")[-1], "r") as f:
-#         asannreader = AudiosetAnnotationReaderV1(f, ontology=ontology)
-#         ytid_num = asannreader.annotation_stats["num_ytids"]
-#         for row in tqdm(asannreader, total=ytid_num):
-#             download_ytaudio(row["YTID"], start_seconds=row["start_seconds"], end_seconds=row["end_seconds"], output_dir=output_dir)
 
 
 def download_audioset_segment(segment_url, output_dir, class_filters):
