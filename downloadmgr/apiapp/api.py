@@ -1,18 +1,10 @@
-from flask import Flask, jsonify, request
+from flask import Blueprint, Flask, jsonify, request, g
+# import db
 
-app = Flask(__name__)
-
-@app.route("/")
-def home():
-    return "<p>Hello, World!</p>"
+bp = Blueprint("api", __name__, url_prefix="/api")
 
 
-@app.route("/id/<dl_id>")
-def show_id_state(dl_id):
-    return f"<p>Show state for: {dl_id}"
-
-
-@app.route("/api/download/next", methods=["GET"])
+@bp.route("/download/next", methods=["GET"])
 def get_next_download():
     """Get the next item to download."""
     return jsonify({
@@ -21,7 +13,7 @@ def get_next_download():
     })
 
 
-@app.route("/api/download/<dl_id>", methods=["GET", "PUT"])
+@bp.route("/download/<dl_id>", methods=["GET", "PUT"])
 def update_download_state(dl_id: str):
     """Update the backend with the current download state, for this download ID."""
     if request.method == "GET":
@@ -34,7 +26,7 @@ def update_download_state(dl_id: str):
         })
 
 
-@app.route("/api/download/batch", methods=["POST"])
+@bp.route("/download/batch", methods=["POST"])
 def batch_update_item_state():
     return jsonify({
         "success": False
