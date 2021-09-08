@@ -7,12 +7,23 @@ from flask.cli import with_appcontext
 DATABASE = "segments.db"
 SCHEMA = "schema.sql"
 
+
 class RecordStatus(enum.Enum):
     UNKNOWN = None
     DL_STARTED = "started"
     DL_FAILED = "failed"
     DL_MISSING = "missing"
     DL_COMPLETED = "completed"
+
+    @staticmethod
+    def values():
+        return {
+            RecordStatus.UNKNOWN.value,
+            RecordStatus.DL_STARTED.value,
+            RecordStatus.DL_FAILED.value,
+            RecordStatus.DL_MISSING.value,
+            RecordStatus.DL_COMPLETED.value
+        }
 
 
 def get_db():
@@ -47,6 +58,34 @@ def init_db_command():
     click.echo("Initialized the database.")
 
 
+@click.command("ingest-raw")
+@click.argument("data-csv", type=click.Path(exists=True))
+@with_appcontext
+def ingest_raw_data(data_csv):
+    click.secho(f"Loading data from {data_csv}")
+
+    import pandas as pd
+
+    df = pd.read_csv(data_csv, compression="zip", index_col=0)
+    df.loc[:, "state"] = RecordStatus.UNKNOWN.value
+    df = df.rename(columns={"YTID": "ytid"})
+    click.echo(f"n segments: {len(df)}")
+
+    click.echo(f"A random sampling:")
+    click.echo(f"{df.sample(3)}")
+
+    db = get_db()
+    df.to_sql("segments", db, index_label="id", method="multi",
+              if_exists="replace", chunksize=32)
+
+    click.echo("Checking number of rows...")
+    cursor = db.execute("SELECT COUNT(*) from segments")
+    for row in cursor:
+        for member in row:
+            print(member)
+
+
 def init_app(app):
     app.teardown_appcontext(close_db)
     app.cli.add_command(init_db_command)
+    app.cli.add_command(ingest_raw_data)

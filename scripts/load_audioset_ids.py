@@ -47,15 +47,15 @@ def load_audioset_ids(audioset_path, dataset_dir):
     eval_train_segment_ids = load_segments(datasplits_path / SEGMENTS_FILES["eval"])
 
     complete_segments_df = pd.concat([
-        pd.DataFrame({"YTID": unbalanced_train_segment_ids, "parition": "unbalanced_train"}),
-        pd.DataFrame({"YTID": balanced_train_segment_ids, "parition": "balanced_train"}),
-        pd.DataFrame({"YTID": eval_train_segment_ids, "parition": "eval"}),
+        pd.DataFrame({"YTID": unbalanced_train_segment_ids, "partition": "unbalanced_train"}),
+        pd.DataFrame({"YTID": balanced_train_segment_ids, "partition": "balanced_train"}),
+        pd.DataFrame({"YTID": eval_train_segment_ids, "partition": "eval"}),
     ], ignore_index=True)
 
     out_file = "all_segments.csv"
     complete_segments_df.to_csv(out_file, compression="zip")
 
-    click.secho(f"All Segments written to:", out_file)
+    click.secho(f"All Segments written to: {out_file}")
 
 
 if __name__ == "__main__":
