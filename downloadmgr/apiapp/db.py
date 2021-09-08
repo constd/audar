@@ -10,6 +10,7 @@ SCHEMA = "schema.sql"
 
 class RecordStatus(enum.Enum):
     UNKNOWN = None
+    DL_REQUESTED = "sent-to-worker"
     DL_STARTED = "started"
     DL_FAILED = "failed"
     DL_MISSING = "missing"
@@ -19,6 +20,7 @@ class RecordStatus(enum.Enum):
     def values():
         return {
             RecordStatus.UNKNOWN.value,
+            RecordStatus.DL_REQUESTED.value,
             RecordStatus.DL_STARTED.value,
             RecordStatus.DL_FAILED.value,
             RecordStatus.DL_MISSING.value,

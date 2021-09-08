@@ -56,6 +56,7 @@ def get_segments_count():
         seg_filter = ""
 
     query = "SELECT COUNT(*) from segments " + seg_filter
+    print(query)
 
     cursor = db.execute(query)
     count_result = None
@@ -87,10 +88,21 @@ def get_next_download():
         ' LIMIT 1'
     )
     segment = db.execute(query).fetchall()
+    ytid = segment[0]["ytid"]
 
     if len(segment) > 0:
+        # Update the state for this single element to say it has already
+        #  been requested.
+        update_query = (
+            f'UPDATE segments SET state = "{RecordStatus.DL_REQUESTED.value}"'
+            f' WHERE ytid = "{ytid}"'
+        )
+        print(update_query)
+        cursor = db.execute(update_query)
+        db.commit()
+
         return jsonify({
-            "download_id": segment[0]["ytid"],
+            "download_id": ytid,
             "success": True
         })
     else:
