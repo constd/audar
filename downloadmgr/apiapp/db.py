@@ -85,7 +85,38 @@ def ingest_raw_data(data_csv):
             print(member)
 
 
+@click.command("bulk-update-state")
+@click.argument("text-file", type=click.Path(exists=True))
+@click.argument("state", type=click.Choice(RecordStatus.values()))
+@with_appcontext
+def bulk_update_state(text_file, state):
+    """Update many IDs at once using a text file.
+    
+    The text file should contain one YTID per line.
+    If it is a CSV, it will look at the first element in the line only,
+    stopping at the first comma.
+    """
+    ytids = []
+    with open(text_file, "r") as fh:
+        for line in fh:
+            first_comma = line.find(",")
+            if first_comma != -1:
+                line = line[:first_comma]
+            ytids.append(line.strip())
+
+    db = get_db()
+
+    for ytid in ytids:
+        query = (
+                f'UPDATE segments SET state = "{state}"'
+                f' WHERE ytid = "{ytid}"'
+            )
+        db.execute(query)
+    db.commit()
+
+
 def init_app(app):
     app.teardown_appcontext(close_db)
     app.cli.add_command(init_db_command)
     app.cli.add_command(ingest_raw_data)
+    app.cli.add_command(bulk_update_state)
