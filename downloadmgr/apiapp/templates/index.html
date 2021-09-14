@@ -1,0 +1,28 @@
+{% extends 'base.html' %}
+
+{% block header %}
+  <h1>{% block title %}Status{% endblock %}</h1>
+{% endblock %}
+
+{% block content %}
+    <p>
+        Number of segments: {{segments|length}}
+    </p>
+    <p>Some example segments:
+        <ul>
+        {% for s in segments[:20] %}
+        <li>
+            {% if "ytid" in s.keys() %}
+                ytid: <a href="/id/{{s.ytid}}">{{s.ytid}}</a>,
+            {% endif %}
+            {% if "partition" in s.keys() %}
+                partition: {{s.partition}},
+            {% endif %}
+            {% if "state" in s.keys() %}
+                state: {{s.state}}
+            {% endif %}
+            </li>
+        {% endfor %}
+        </ul>
+    </p>
+{% endblock %}
